@@ -2,8 +2,8 @@ let isPlayerOne = true; // o
 
 let gameState = {
   state: "no game",
-  playerOnePos: [],
-  playerTwoPos: [],
+  "player one": [],
+  "player two": [],
 };
 
 let winningStates = [
@@ -17,6 +17,31 @@ let winningStates = [
   [3, 5, 7],
 ];
 
+const checkIfWin = (player) => {
+  for (indexNo in winningStates) {
+    let matches = 0;
+    for (let n = 0; n < 3; n++) {
+      if (gameState[player].includes(winningStates[indexNo][n])) {
+        matches++;
+      }
+      if (matches === 3) {
+        gameState = { ...gameState, state: "game over" };
+        document.getElementById(
+          "game-state"
+        ).innerHTML = `<h2>${player} WINS!</h2>`;
+      }
+    }
+  }
+};
+
+const playerTurn = (player, squareId) => {
+  const oOrX = player === "player one" ? "O" : "X";
+  document.getElementById(squareId).innerHTML = oOrX;
+  gameState[player] = [...gameState[player], squareId]; //this is okay
+  checkIfWin(player);
+  document.getElementById("player").innerHTML = `<h2>${player}</h2>`;
+};
+
 const gameLogic = (squareId) => {
   document.getElementById(squareId).addEventListener("click", function () {
     if (
@@ -26,44 +51,13 @@ const gameLogic = (squareId) => {
       return;
     }
     if (isPlayerOne) {
-      document.getElementById(squareId).innerHTML = "O";
+      playerTurn("player one", squareId);
       isPlayerOne = false;
-      gameState.playerOnePos = [...gameState.playerOnePos, squareId]; //this is okay
-      for (indexNo in winningStates) {
-        let matches = 0;
-        for (let n = 0; n < 3; n++) {
-          if (gameState.playerOnePos.includes(winningStates[indexNo][n])) {
-            matches++;
-          }
-          if (matches === 3) {
-            gameState = { ...gameState, state: "game over" };
-
-            document.getElementById("game-state").innerHTML =
-              "<h2>Player Two WINS!</h2>";
-          }
-        }
-      }
-      document.getElementById("player").innerHTML = "<h2>Player Two</h2>";
     } else {
-      document.getElementById(squareId).innerHTML = "X";
+      playerTurn("player two", squareId);
       isPlayerOne = true;
-      gameState.playerTwoPos = [...gameState.playerTwoPos, squareId];
-      for (indexNo in winningStates) {
-        let matches = 0;
-        for (let n = 0; n < 3; n++) {
-          if (gameState.playerTwoPos.includes(winningStates[indexNo][n])) {
-            matches++;
-          }
-          if (matches === 3) {
-            gameState = { ...gameState, state: "game over" };
-            document.getElementById("game-state").innerHTML =
-              "<h2>Player Two WINS!</h2>";
-          }
-        }
-      }
-      document.getElementById("player").innerHTML = "<h2>Player One</h2>";
     }
-    if (gameState.playerOnePos.length === 5) {
+    if (gameState["player one"].length === 5) {
       state = "draw";
     }
   });
@@ -72,13 +66,3 @@ const gameLogic = (squareId) => {
 for (let i = 1; i < 10; i++) {
   gameLogic(i);
 }
-
-// gameLogic(1)
-// gameLogic(2)
-// gameLogic(3)
-// gameLogic(4)
-// gameLogic(5)
-// gameLogic(6)
-// gameLogic(7)
-// gameLogic(8)
-// gameLogic(9)
